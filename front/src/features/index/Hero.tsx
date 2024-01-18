@@ -1,16 +1,20 @@
-import React, {ChangeEvent, FC, ReactElement, RefObject, useEffect, useRef, useState} from 'react';
+import {ChangeEvent, FC, FormEvent, ReactElement, RefObject, useEffect, useRef, useState} from 'react';
 import Button from "../../shared/button/Button.tsx";
 import {v4 as uuidv4} from 'uuid'
 import Typed from 'typed.js'
 import TextInput from "../../shared/input/TextInput.tsx";
 import {FaSearch} from "react-icons/fa";
+import {replaceSpacesWithDash} from "../../shared/utils/utils.service.ts";
+import {createSearchParams, NavigateFunction, useNavigate} from "react-router-dom";
 const categories: string[] = ['Graphics & Design', 'Digital Marketing', 'Writing & Translation', 'Programming & Tech']
 
 const Hero:FC = (): ReactElement => {
     const typedElement: RefObject<HTMLSpanElement> = useRef<HTMLSpanElement>(null);
     const [searchTerm, setSearchTerm] = useState<string>('');
+    const navigate: NavigateFunction = useNavigate()
     const navigatorToSearchPage = ():void => {
-        
+        const url = `/gigs/search?${createSearchParams({query: searchTerm.trim() })}`
+        navigate(url)
     }
     useEffect(() => {
         const typed = new Typed(typedElement.current, {
@@ -48,7 +52,11 @@ const Hero:FC = (): ReactElement => {
                         </p>
 
                         <div className="flex w-full justify-between gap-6 lg:gap-12">
-                            <form className="mx-auto flex w-full items-center bg-white">
+                            <form className="mx-auto flex w-full items-center bg-white"
+                            onSubmit={(event: FormEvent) => {
+                                event.preventDefault()
+                                navigatorToSearchPage()
+                            } }>
                                 <div className="w-full">
                                     <TextInput type="search"
                                            className="w-full rounded-full px-4 py-1 text-gray-800 focus:outline-none"
@@ -76,7 +84,7 @@ const Hero:FC = (): ReactElement => {
                                     className="w-full min-w-0 cursor-pointer rounded-full border border-gray-200 p-4 duration-300 hover:border-cyan-400 hover:shadow-lg hover:shadow-cyan-600/20 dark:border-gray-700 dark:bg-gray-800 dark:hover:border-cyan-300/30">
                                     <div className="flex justify-center">
                             <span className="block truncate font-medium dark:text-white">
-                                <a href={`/search/categories/${category}`}>{category}</a>
+                                <a href={`/search/categories/${replaceSpacesWithDash(category)}`}>{category}</a>
                             </span>
                                     </div>
                                 </div>
